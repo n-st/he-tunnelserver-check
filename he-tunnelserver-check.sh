@@ -4,17 +4,17 @@ tunserver_count=${#tunserver_array[@]}
 
 i=1
 (
-    echo -e "Location\tIP\tmin\tavg\tmax\tmdev"
+    printf 'Location\tIP\tmin\tavg\tmax\tmdev\n'
     (
         for server in $tunservers
         do
-            echo -en "\rPinging $i/$tunserver_count..." 1>&2
+            printf '\rPinging %d/%d...' $i $tunserver_count 1>&2
             ((i++))
             location="${server%:*}"
             location="${location//_/ }"
             ip="${server##*:}"
-            echo -e "$location\t$ip\t$(ping -nq -c6 -i0.3 -w3 $ip |& tail -n 1 | cut -d' ' -f4 | tr '/' '\t')"
+            printf '%s\t%s\t%s\n' "$location" "$ip" "$(ping -nq -c6 -i0.3 -w3 $ip |& tail -n 1 | cut -d' ' -f4 | tr '/' '\t')"
         done
-        echo -en "\r" 1>&2
+        printf '\r' 1>&2
     ) | sort -n -t '	' -k4
 ) | column -t -s'	'
